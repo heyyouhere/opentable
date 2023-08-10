@@ -1,19 +1,22 @@
 #![allow(dead_code)]
 
 mod gameobjects;
-
-use json::*;
-use std::fs::File;
-use std::io::prelude::*;
+mod maps;
 
 
+use std::time::SystemTime;
+use std::fs::{File, read_dir};
+use serde::*;
+use std::io::{BufReader, BufWriter};
 
-#[derive(Debug)]
+
+
+#[derive(Debug, Deserialize, Serialize)]
 struct Player{
     nickname: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize, Serialize)]
 enum GameActionEnum{
     Roll,
     TextMessage,
@@ -21,17 +24,19 @@ enum GameActionEnum{
     Disconnect,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
 struct GameAction{
     type_ : GameActionEnum,
     actor : Player,
     timestamp : SystemTime,
 }
 
+#[derive(Debug, Deserialize, Serialize)]
 struct Game{
     name : String,
     id : u8,
     actions : Vec<GameAction>,
-    
+    maps : Vec<String>,
 }
 impl Game{
     fn new(name: String) -> Self{
@@ -39,59 +44,70 @@ impl Game{
             name,
             id : 0,
             actions : vec!(),
+            maps : vec!(),
         }
     }
     
     fn save_local(&self, path : String){
-        let j = object!{
-            name : self.name.to_string(),
-            id : self.id,
-        };
-        let mut file = File::create(format!("{path}/{}.json", self.name.to_string())).unwrap();
-        //TODO: Raise exception on file write error
-        let _ = file.write_all(j.dump().as_bytes());
+        let file = File::create(format!("{path}/{}.json", self.name)).unwrap();
+        let _ = serde_json::to_writer(BufWriter::new(file), self);
     }
-
     fn load_local(filepath: String) -> Self{
-        let mut file = File::open(&filepath).unwrap();
-        let mut contents = String::new();
-        let _ = file.read_to_string(&mut contents);
-        let parsed = json::parse(&contents).unwrap();
-        let game = Game {
-            name: parsed["name"].to_string(),
-            id: parsed["id"].as_u8().unwrap(),
-            actions : vec!(),
-        };
+        let file = File::open(filepath).unwrap();
+        let game = serde_json::from_reader(BufReader::new(file)).unwrap();
         game
     }
+    fn add_map(&mut self, map : maps::Map){
+        self.maps.push(map.path);
+    }
 }
 
-use std::time::SystemTime;
-use std::fs;
 
 fn load_games(path: String) -> Vec<Game>{
-    let paths = fs::read_dir(path).unwrap();
-    let mut games : Vec<Game> = vec!();
-    for p in paths {
-        games.push(Game::load_local(p.unwrap().path().to_str().unwrap().to_string()));
-    }
+    let paths = read_dir(path).unwrap();
+    let games : Vec<Game> = paths.map(|p| Game::load_local(p.unwrap().path().to_str().unwrap().to_string())).collect();
     games
 }
+mod server;
+fn main(){
+    server::serve("0.0.0.0:1583");
 
-fn main() {
-    let games =  load_games("./src/games".to_string());
-    println!("Loaded {} games:", games.len());
-    for g in games{
-        println!("  {}", g.name);
-    }
-
-    let game_objects = gameobjects::load_game_objects("./src/gameobjects".to_string());
-    println!("\nLoaded {} game_objects", game_objects.len());
-    for go in game_objects{
-        println!("  {} {}", go.name, go.asset_path);
-    }
-  
-
-    //let new_game = Game::new("SavageWorldGame".to_string());
-    //new_game.save_local("./src/games".to_string());
 }
+fn main2() {
+    let action = GameAction{
+            type_ : GameActionEnum::TextMessage,
+            actor : Player{nickname:  "heyyouhere".to_string()},
+            timestamp : SystemTime::now(),
+        };
+    /*
+        let my_game = Game{
+        name: "Serde-Game".to_string(),
+        id : 0,
+        actions : vec!(),
+        maps: vec!(),
+    };
+    my_game.save_local("src/".to_string());
+    */
+
+    let mut loaded_game = Game::load_local("src/Serde-Game.json".to_string());
+    loaded_game.actions.push(action);
+    loaded_game.save_local("src/".to_string());
+
+}
+
+
+/*        --> Map  
+ *   Game
+ *
+ *
+ *
+ *
+ *
+ */
+
+
+
+
+
+
+
