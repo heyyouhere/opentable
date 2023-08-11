@@ -1,1 +1,1 @@
-{"name":"SavageWorldGame","id":0,"actions_len":0}
+{"name":"SavageWorldsGame","id":0,"maps":["./src/maps/SavageMap.json", "./src/maps/NewMap.js"],"actions":[]}

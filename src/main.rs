@@ -1,112 +1,125 @@
-#![allow(dead_code)]
-
-mod gameobjects;
-mod maps;
-
-
-use std::time::SystemTime;
+use serde::forward_to_deserialize_any;
+use tiny_http::{Server, Request, Response, StatusCode, Method, Header};
+use std::io::{Result, Read};
+use std::path::{Path, PathBuf};
 use std::fs::{File, read_dir};
-use serde::*;
-use std::io::{BufReader, BufWriter};
+
+use crate::game::Game;
 
 
 
-#[derive(Debug, Deserialize, Serialize)]
-struct Player{
-    nickname: String,
+mod game;
+
+fn serve_404(request: Request) -> Result<()>{
+    request.respond(Response::from_string("404").with_status_code(StatusCode(404)))
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-enum GameActionEnum{
-    Roll,
-    TextMessage,
-    Connect,
-    Disconnect,
+fn serve_file(mut request: Request) -> Result<()>{
+    let cors  = Header::from_bytes("Access-Control-Allow-Origin", "*").unwrap();
+    let cors2 = Header::from_bytes("Access-Control-Allow-Headers", "*").unwrap();
+    let cors3 = Header::from_bytes("Access-Control-Allow-Methods", "*").unwrap();
+    let mut filename = String::new();
+    request.as_reader().read_to_string(&mut filename)?;
+    println!("{filename}");
+    let requested_file = File::open(filename)?;
+    request.respond(Response::from_file(requested_file)
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
 }
 
-#[derive(Debug, Deserialize, Serialize)]
-struct GameAction{
-    type_ : GameActionEnum,
-    actor : Player,
-    timestamp : SystemTime,
-}
-
-#[derive(Debug, Deserialize, Serialize)]
-struct Game{
-    name : String,
-    id : u8,
-    actions : Vec<GameAction>,
-    maps : Vec<String>,
-}
-impl Game{
-    fn new(name: String) -> Self{
-        Game { 
-            name,
-            id : 0,
-            actions : vec!(),
-            maps : vec!(),
+fn handle_request(mut request: Request) -> Result<()>{
+    let cors  = Header::from_bytes("Access-Control-Allow-Origin", "*").unwrap();
+    let json  = Header::from_bytes("Content-type", "application/json").unwrap();
+    let cors2 = Header::from_bytes("Access-Control-Allow-Headers", "*").unwrap();
+    let cors3 = Header::from_bytes("Access-Control-Allow-Methods", "*").unwrap();
+    match (request.method(), request.url()){
+        (Method::Get, "/") => {
+            request.respond(Response::from_string("[{\"hello\" : \"world\"}, {\"you\" : \"sexy\"}]")
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
+        },
+        (Method::Get, "/api/games") => {
+            let games = game::load_games("./src/games/");
+            request.respond(Response::from_string(serde_json::to_string(&games).unwrap())
+                          .with_header(json)
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200))
+                            )
         }
-    }
-    
-    fn save_local(&self, path : String){
-        let file = File::create(format!("{path}/{}.json", self.name)).unwrap();
-        let _ = serde_json::to_writer(BufWriter::new(file), self);
-    }
-    fn load_local(filepath: String) -> Self{
-        let file = File::open(filepath).unwrap();
-        let game = serde_json::from_reader(BufReader::new(file)).unwrap();
-        game
-    }
-    fn add_map(&mut self, map : maps::Map){
-        self.maps.push(map.path);
+        (Method::Post, "/api/games") => {
+            let mut content = String::new();
+            request.as_reader().read_to_string(&mut content)?;
+            let new_game = game::Game::new(content);
+            new_game.save_local();
+            request.respond(Response::from_string("Created New game")
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
+
+        }
+        (Method::Get, "/api/pdfs") => {
+            let paths = read_dir("src/assets/").unwrap();
+            let mut j = "[".to_string();
+            for p in paths{
+                j = format!("{j}\"{}\",", p.unwrap().path().to_str().unwrap().to_string());
+            }
+            j.pop();
+            j = format!("{j}]");
+            request.respond(Response::from_string(j)
+                            .with_header(json)
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
+        },
+        (Method::Get, url) if url.starts_with("/assets")=>
+        {
+            let url = request.url();
+            let path = Path::new("./src/").join(url.strip_prefix('/').unwrap());
+            if let Ok(mut file) = File::open(path) {
+                let mut content = Vec::new();
+                file.read_to_end(&mut content)?;
+                let response = Response::from_data(content);
+                let pdf1 = Header::from_bytes("Content-Type", "application/pdf").unwrap();
+                request.respond(response
+                                .with_header(cors)
+                                .with_header(cors2)
+                                .with_header(cors3)
+                                .with_header(pdf1))
+
+            } else {
+                request.respond(Response::from_string("404 Not Found"))
+            }
+        },
+        (Method::Options, _) =>  {
+            request.respond(Response::from_string("")
+                .with_header(cors)
+                .with_header(cors2)
+                .with_header(cors3)
+                .with_status_code(StatusCode(200)))
+        },
+        _ => serve_404(request)
+
     }
 }
 
-
-fn load_games(path: String) -> Vec<Game>{
-    let paths = read_dir(path).unwrap();
-    let games : Vec<Game> = paths.map(|p| Game::load_local(p.unwrap().path().to_str().unwrap().to_string())).collect();
-    games
-}
-mod server;
 fn main(){
-    server::serve("0.0.0.0:1583");
+    let address = "0.0.0.0:1583";
+    let server = Server::http(&address).unwrap();
 
+    for request in server.incoming_requests(){
+        println!("{request:?}");
+        let _ = handle_request(request).map_err(|err| 
+                                                eprintln!("[ERROR] While handling request error happend: {err}"));
+    }
 }
-fn main2() {
-    let action = GameAction{
-            type_ : GameActionEnum::TextMessage,
-            actor : Player{nickname:  "heyyouhere".to_string()},
-            timestamp : SystemTime::now(),
-        };
-    /*
-        let my_game = Game{
-        name: "Serde-Game".to_string(),
-        id : 0,
-        actions : vec!(),
-        maps: vec!(),
-    };
-    my_game.save_local("src/".to_string());
-    */
-
-    let mut loaded_game = Game::load_local("src/Serde-Game.json".to_string());
-    loaded_game.actions.push(action);
-    loaded_game.save_local("src/".to_string());
-
-}
-
-
-/*        --> Map  
- *   Game
- *
- *
- *
- *
- *
- */
-
-
-
 
 
 
