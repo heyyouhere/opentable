@@ -1,0 +1,137 @@
+<html>
+
+<head>
+    <title> Opentable </title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+
+<body>
+    <span class="Games">
+        <div>
+            <input id="new_game_name">
+            <button id="new_game_button" class="NewGameButton"> Create New Map</button>
+            <button id="reload"> Reload Games</button>
+        </div>
+        </div>
+            Games
+        </div>
+        <div id="Games-container"> </div>
+    </span>
+    <span class="MapsObjects">
+        <div class="Maps">
+            MAPS
+        <div id="Maps-container"> </div>
+        </div>
+        <div class="Objects">
+            GameObjects
+        </div>
+    </span>
+    <span class="Pdfs">
+        PDFS
+    </span>
+
+    <!-- 
+    <button id="reload"> Reload Games</button>
+    <div id="Games-container" class="Games">
+    </div>
+    <div>
+        <input id="new_game_name">
+    </div>
+    <div>
+        <button id="new_game_button" class="NewGameButton"> Create New Map</button>
+    </div> -->
+    <!-- <div class="controls">
+        <div>
+            <button id="button" style="background-color: red; width : 500px; height : 250px; font-size: 45">
+                Get PDFS
+            </button>
+        </div>
+        <div id="pdfs">
+        </div>
+    </div>
+    <span class="pdf-viewer" id="example1"></span> -->
+</body>
+
+
+<script src="/pdfobject.js"></script>
+
+<script>
+    let current_game;
+
+    function load_games() {
+        while (document.getElementById("Games-container").hasChildNodes()) {
+            document.getElementById("Games-container").removeChild(document.getElementById("Games-container").lastChild);
+        }
+        var xhttp = new XMLHttpRequest();
+        xhttp.open("GET", "http://77.232.23.43:1583/api/games");
+        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
+        xhttp.send();
+        xhttp.onload = () => {
+            let games = JSON.parse(xhttp.response)
+            games.forEach(game => {
+                let game_div = document.createElement('div')
+                game_div.className = 'Game'
+                game_div.innerText = game.name
+                document.getElementById("Games-container").appendChild(game_div)
+                game_div.onclick = () => {
+                    current_game = game;
+                    document.title = current_game.name + ' | Opentable'
+                    let container = document.getElementById('Maps-container')
+                    while (container.hasChildNodes()) {
+                        container.removeChild(container.lastChild);
+                    }
+                    game.maps.forEach(map => {
+                        console.log(map)
+                        let map_div = document.createElement('div')
+                        map_div.innerText = map
+                        container.appendChild(map_div)
+                    })
+                }
+            });
+        };
+    }
+    load_games();
+    document.getElementById("reload").onclick = () => {
+        load_games();
+    }
+
+    document.getElementById("new_game_button").onclick = () => {
+            let new_game_name = document.getElementById("new_game_name").value;
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "http://77.232.23.43:1583/api/games");
+            xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
+            xhttp.send(new_game_name);
+            xhttp.onload = () => {
+                load_games();
+            }
+        }
+        // document.getElementById("button").onclick = () => {
+        //     var xhttp = new XMLHttpRequest();
+        //     xhttp.open("GET", "http://77.232.23.43:1583/api/pdfs");
+        //     xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
+        //     xhttp.send();
+        //     xhttp.onload = () => {
+        //         console.log(xhttp.responseText)
+        //         show_games(xhttp.responseText)
+        //     };
+        // }
+
+    // function show_games(data) {
+    //     let games = JSON.parse(data);
+    //     console.log(games);
+    //     games.forEach(game => {
+    //         let pdf_button = document.createElement('button')
+    //         pdf_button.className = "PDFButton";
+    //         let filename = game.split('/').at(-1);
+    //         pdf_button.innerText = filename;
+    //         document.getElementById('pdfs').appendChild(pdf_button)
+    //         pdf_button.onclick = () => {
+    //             let pdfUrl = "http://77.232.23.43:1583/assets/" + filename;
+    //             PDFObject.embed(pdfUrl, '#example1'); // you can add {page : "100"} to open pdf on that page
+    //         }
+    //     })
+    // }
+</script>
+
+</html>
