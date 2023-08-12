@@ -36,7 +36,28 @@ fn handle_request(mut request: Request) -> Result<()>{
     let cors3 = Header::from_bytes("Access-Control-Allow-Methods", "*").unwrap();
     match (request.method(), request.url()){
         (Method::Get, "/") => {
-            request.respond(Response::from_string("[{\"hello\" : \"world\"}, {\"you\" : \"sexy\"}]")
+            request.respond(Response::from_file(File::open("./src/web-src/index.html")?)
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
+        },
+        (Method::Get, "/favicon.ico") => {
+            request.respond(Response::from_file(File::open("./src/web-src/favicon.ico")?)
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
+        },
+        (Method::Get, "/style.css") => {
+            request.respond(Response::from_file(File::open("./src/web-src/style.css")?)
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3)
+                            .with_status_code(StatusCode(200)))
+        },
+        (Method::Get, "/pdfobject.js") => {
+            request.respond(Response::from_file(File::open("./src/web-src/pdfobject.js")?)
                             .with_header(cors)
                             .with_header(cors2)
                             .with_header(cors3)

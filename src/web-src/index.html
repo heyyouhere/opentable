@@ -11,23 +11,23 @@
         <div>
             <input id="new_game_name">
             <button id="new_game_button" class="NewGameButton"> Create New Map</button>
-            <button id="reload"> Reload Games</button>
+            <button id="reload_button"> Reload Games</button>
         </div>
         </div>
             Games
         </div>
-        <div id="Games-container"> </div>
+        <div id="games_container"> </div>
     </span>
     <span class="MapsObjects">
         <div class="Maps">
             MAPS
-        <div id="Maps-container"> </div>
+        <div id="maps_container"> </div>
         </div>
         <div class="Objects">
             GameObjects
         </div>
     </span>
-    <span class="Pdfs">
+    <span class="PDFs">
         PDFS
     </span>
 
@@ -60,8 +60,9 @@
     let current_game;
 
     function load_games() {
-        while (document.getElementById("Games-container").hasChildNodes()) {
-            document.getElementById("Games-container").removeChild(document.getElementById("Games-container").lastChild);
+        let games_containter = document.getElementById("games_container");
+        while (games_containter.hasChildNodes()) {
+            games_containter.removeChild(games_containter.lastChild);
         }
         var xhttp = new XMLHttpRequest();
         xhttp.open("GET", "http://77.232.23.43:1583/api/games");
@@ -73,26 +74,25 @@
                 let game_div = document.createElement('div')
                 game_div.className = 'Game'
                 game_div.innerText = game.name
-                document.getElementById("Games-container").appendChild(game_div)
+                games_containter.appendChild(game_div)
                 game_div.onclick = () => {
                     current_game = game;
                     document.title = current_game.name + ' | Opentable'
-                    let container = document.getElementById('Maps-container')
-                    while (container.hasChildNodes()) {
-                        container.removeChild(container.lastChild);
+                    let maps_container = document.getElementById("maps_container")
+                    while (maps_container.hasChildNodes()) {
+                        maps_container.removeChild(maps_container.lastChild);
                     }
                     game.maps.forEach(map => {
-                        console.log(map)
                         let map_div = document.createElement('div')
                         map_div.innerText = map
-                        container.appendChild(map_div)
+                        maps_container.appendChild(map_div)
                     })
                 }
             });
         };
     }
     load_games();
-    document.getElementById("reload").onclick = () => {
+    document.getElementById("reload_button").onclick = () => {
         load_games();
     }
 
