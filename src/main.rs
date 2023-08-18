@@ -1,10 +1,9 @@
-use serde::forward_to_deserialize_any;
-use tiny_http::{Server, Request, Response, StatusCode, Method, Header};
+//use serde::forward_to_deserialize_any;
+use tiny_http:: {Server, Request, Response, StatusCode, Method, Header};
 use std::io::{Result, Read};
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::fs::{File, read_dir};
 
-use crate::game::Game;
 
 
 
@@ -31,6 +30,7 @@ fn serve_file(mut request: Request) -> Result<()>{
 
 fn handle_request(mut request: Request) -> Result<()>{
     let cors  = Header::from_bytes("Access-Control-Allow-Origin", "*").unwrap();
+    let pdf1 = Header::from_bytes("Content-Type", "application/pdf").unwrap();
     let json  = Header::from_bytes("Content-type", "application/json").unwrap();
     let cors2 = Header::from_bytes("Access-Control-Allow-Headers", "*").unwrap();
     let cors3 = Header::from_bytes("Access-Control-Allow-Methods", "*").unwrap();
@@ -42,20 +42,22 @@ fn handle_request(mut request: Request) -> Result<()>{
                             .with_header(cors3)
                             .with_status_code(StatusCode(200)))
         },
-        (Method::Get, "/favicon.ico") => {
-            request.respond(Response::from_file(File::open("./src/web-src/favicon.ico")?)
+        (Method::Get, "/script.js") => {
+            request.respond(Response::from_file(File::open("./src/web-src/script.js")?)
                             .with_header(cors)
                             .with_header(cors2)
                             .with_header(cors3)
                             .with_status_code(StatusCode(200)))
         },
-        (Method::Get, "/style.css") => {
-            request.respond(Response::from_file(File::open("./src/web-src/style.css")?)
+        (Method::Post, "/message") => {
+            let mut content = String::new();
+            request.as_reader().read_to_string(&mut content)?;
+            request.respond(Response::from_string(content)
                             .with_header(cors)
                             .with_header(cors2)
                             .with_header(cors3)
                             .with_status_code(StatusCode(200)))
-        },
+        }
         (Method::Get, "/pdfobject.js") => {
             request.respond(Response::from_file(File::open("./src/web-src/pdfobject.js")?)
                             .with_header(cors)
@@ -100,24 +102,18 @@ fn handle_request(mut request: Request) -> Result<()>{
                             .with_header(cors3)
                             .with_status_code(StatusCode(200)))
         },
-        (Method::Get, url) if url.starts_with("/assets")=>
+        (Method::Get, url) if url.starts_with("/frames")=>
         {
             let url = request.url();
-            let path = Path::new("./src/").join(url.strip_prefix('/').unwrap());
-            if let Ok(mut file) = File::open(path) {
-                let mut content = Vec::new();
-                file.read_to_end(&mut content)?;
-                let response = Response::from_data(content);
-                let pdf1 = Header::from_bytes("Content-Type", "application/pdf").unwrap();
-                request.respond(response
-                                .with_header(cors)
-                                .with_header(cors2)
-                                .with_header(cors3)
-                                .with_header(pdf1))
+            let path = Path::new("./src/web-src/").join(url.strip_prefix('/').unwrap());
+            println!("{path:?}");
+            let file = File::open(path);
+            let response = Response::from_file(file.unwrap());
+            request.respond(response
+                            .with_header(cors)
+                            .with_header(cors2)
+                            .with_header(cors3))
 
-            } else {
-                request.respond(Response::from_string("404 Not Found"))
-            }
         },
         (Method::Options, _) =>  {
             request.respond(Response::from_string("")
@@ -131,7 +127,10 @@ fn handle_request(mut request: Request) -> Result<()>{
     }
 }
 
+mod rolls;
+
 fn main(){
+    //  rolls::test();
     let address = "0.0.0.0:1583";
     let server = Server::http(&address).unwrap();
 

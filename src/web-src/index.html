@@ -1,137 +1,87 @@
+<!DOCTYPE html>
 <html>
+    <head>
+        <title> HTML </title>
+        <meta charset="UTF-8">
+     </head>
+     <body>
+     </body>
+     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
+     <script type="text/javascript" src="https://golden-layout.com/files/latest/js/goldenlayout.min.js"></script>
+     <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-base.css" />
 
-<head>
-    <title> Opentable </title>
-    <link rel="stylesheet" href="style.css">
-</head>
+     <script>
 
+         var config = {
+             content: [
+                 {type: 'row',
+                     content:[{
+                         type: 'component',
+                         componentName: 'CharSheet',
+                         componentState: { label: 'A' }
+                     },
+                     {type: 'column',
+                         content:[{
+                             type: 'component',
+                             componentName: 'Chat',
+                             isClosable: false,
+                             componentState: { label: 'Hello, Anna!' }
+                         }]},
+                     {type: 'row',
+                         content:[{
+                             type: 'component',
+                             componentName: 'Music',
+                             width: 30,
+                             height: 30,
+                             componentState: { label: 'Hello, Anna!' }
+                         }]},
+                     {type: 'column',
+                         content:[{
+                             type: 'component',
+                             componentName: 'PDF',
+                             componentState: { label: 'Hello, Anna!' }
+                         }]}
+                     ]
+             }]
 
-<body>
-    <span class="Games">
-        <div>
-            <input id="new_game_name">
-            <button id="new_game_button" class="NewGameButton"> Create New Map</button>
-            <button id="reload_button"> Reload Games</button>
-        </div>
-        </div>
-            Games
-        </div>
-        <div id="games_container"> </div>
-    </span>
-    <span class="MapsObjects">
-        <div class="Maps">
-            MAPS
-        <div id="maps_container"> </div>
-        </div>
-        <div class="Objects">
-            GameObjects
-        </div>
-    </span>
-    <span class="PDFs">
-        PDFS
-    </span>
+         };
 
-    <!-- 
-    <button id="reload"> Reload Games</button>
-    <div id="Games-container" class="Games">
-    </div>
-    <div>
-        <input id="new_game_name">
-    </div>
-    <div>
-        <button id="new_game_button" class="NewGameButton"> Create New Map</button>
-    </div> -->
-    <!-- <div class="controls">
-        <div>
-            <button id="button" style="background-color: red; width : 500px; height : 250px; font-size: 45">
-                Get PDFS
-            </button>
-        </div>
-        <div id="pdfs">
-        </div>
-    </div>
-    <span class="pdf-viewer" id="example1"></span> -->
-</body>
+         var myLayout,
+             savedState = localStorage.getItem( 'savedState' );
 
+         if( savedState !== null ) {
+             myLayout = new GoldenLayout( JSON.parse( savedState ) );
+         } else {
+             myLayout = new GoldenLayout( config );
+         }
+         myLayout.registerComponent("CharSheet", function( container, componentState ){
+             container.getElement().html(
+                 '<div style="background-color: white; width:100%; height:100%">  <iframe width=100%" height="100%"" src="/frames/roll20-sheets/fate/fate_core_with_rolls-deutsch.html" title="fate"></iframe> </div>'
+             );
+         });
+         myLayout.registerComponent("Chat", function( container, componentState ){
+             container.getElement().html(
+                 '<iframe width="100%" height="100%" src="/frames/chat/chat.html"></iframe>'
+             );
+         });
+         myLayout.registerComponent("PDF", function( container, componentState ){
+             container.getElement().html(
+                 '<iframe width="100%" height="100%" src="/frames/pdf/pdf.html"></iframe>'
+             );
+         });
+         myLayout.registerComponent("Music", function( container, componentState ){
+             container.getElement().html(
+                 '<iframe width="100%" height="100%" src="/frames/music/music.html"></iframe>'
+             );
+         });
 
-<script src="/pdfobject.js"></script>
+         myLayout.init();
+         myLayout.on( 'stateChanged', function(){
+             var state = JSON.stringify( myLayout.toConfig() );
+             localStorage.setItem( 'savedState', state );
+         });
+     </script>
 
-<script>
-    let current_game;
-
-    function load_games() {
-        let games_containter = document.getElementById("games_container");
-        while (games_containter.hasChildNodes()) {
-            games_containter.removeChild(games_containter.lastChild);
-        }
-        var xhttp = new XMLHttpRequest();
-        xhttp.open("GET", "http://77.232.23.43:1583/api/games");
-        xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
-        xhttp.send();
-        xhttp.onload = () => {
-            let games = JSON.parse(xhttp.response)
-            games.forEach(game => {
-                let game_div = document.createElement('div')
-                game_div.className = 'Game'
-                game_div.innerText = game.name
-                games_containter.appendChild(game_div)
-                game_div.onclick = () => {
-                    current_game = game;
-                    document.title = current_game.name + ' | Opentable'
-                    let maps_container = document.getElementById("maps_container")
-                    while (maps_container.hasChildNodes()) {
-                        maps_container.removeChild(maps_container.lastChild);
-                    }
-                    game.maps.forEach(map => {
-                        let map_div = document.createElement('div')
-                        map_div.innerText = map
-                        maps_container.appendChild(map_div)
-                    })
-                }
-            });
-        };
-    }
-    load_games();
-    document.getElementById("reload_button").onclick = () => {
-        load_games();
-    }
-
-    document.getElementById("new_game_button").onclick = () => {
-            let new_game_name = document.getElementById("new_game_name").value;
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "http://77.232.23.43:1583/api/games");
-            xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
-            xhttp.send(new_game_name);
-            xhttp.onload = () => {
-                load_games();
-            }
-        }
-        // document.getElementById("button").onclick = () => {
-        //     var xhttp = new XMLHttpRequest();
-        //     xhttp.open("GET", "http://77.232.23.43:1583/api/pdfs");
-        //     xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencode');
-        //     xhttp.send();
-        //     xhttp.onload = () => {
-        //         console.log(xhttp.responseText)
-        //         show_games(xhttp.responseText)
-        //     };
-        // }
-
-    // function show_games(data) {
-    //     let games = JSON.parse(data);
-    //     console.log(games);
-    //     games.forEach(game => {
-    //         let pdf_button = document.createElement('button')
-    //         pdf_button.className = "PDFButton";
-    //         let filename = game.split('/').at(-1);
-    //         pdf_button.innerText = filename;
-    //         document.getElementById('pdfs').appendChild(pdf_button)
-    //         pdf_button.onclick = () => {
-    //             let pdfUrl = "http://77.232.23.43:1583/assets/" + filename;
-    //             PDFObject.embed(pdfUrl, '#example1'); // you can add {page : "100"} to open pdf on that page
-    //         }
-    //     })
-    // }
-</script>
 
 </html>

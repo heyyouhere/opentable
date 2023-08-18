@@ -1,0 +1,20 @@
+.Chat{
+    height: 100%;
+    background-color : paleturquoise;
+}
+.Message{
+    margin-top: 10px;
+    width: 90%;
+    margin-left: 5%;
+    background-color: palevioletred;
+    border-style: solid;
+    border-width: 3px;
+    border-color: black;
+}
+.Message_text{
+    margin-left: 24px ;
+}
+.Send_container{
+    background-color: red;
+}
+

@@ -1,0 +1,41 @@
+@import url("https://fonts.googleapis.com/css2?family=Saira");
+body{
+    background-color: #171717;
+}
+
+div{
+    color: #FFF;
+    font-family: Saira;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: normal; 
+}
+
+button{
+    font-family: Saira;
+    font-size: 200%;
+    width: 90%;
+    margin-left: 5%;
+    border: none;
+    font-style: normal;
+}
+.slider{
+    width: 90%;
+    margin-left: 5%;
+    accent-color: #674D73;
+}
+.action_button{
+    background-color: #171717;
+    color: #FFF;
+    text-align: left;
+}
+.add_button{
+    color: #FFF;
+    text-align: center;
+    font-weight: 700;
+    border-radius: 20px;
+    background-color: #674D73;
+    line-height: normal;
+}
+

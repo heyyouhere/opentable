@@ -10,30 +10,32 @@ use std::io::{BufReader, BufWriter};
 
 
 #[derive(Debug, Deserialize, Serialize)]
-struct Player{
-    nickname: String,
+pub struct Player{
+    pub nickname: String,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
-enum GameActionEnum{
+pub enum GameActionEnum{
     Roll,
     TextMessage,
     Connect,
     Disconnect,
 }
 
+
 #[derive(Debug, Deserialize, Serialize)]
-struct GameAction{
-    type_ : GameActionEnum,
-    actor : Player,
-    timestamp : SystemTime,
+pub struct GameAction{
+  pub  type_ : GameActionEnum,
+  pub  actor : Player,
+  pub  content : String,
+  pub timestamp : SystemTime,
 }
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct Game{
     name : String,
     id : u8,
-    actions : Vec<GameAction>,
+    pub actions : Vec<GameAction>,
     maps : Vec<String>,
 }
 impl Game{
