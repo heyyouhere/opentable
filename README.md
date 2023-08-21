@@ -11,18 +11,18 @@ Site is now available on http://localhost:1583
 
 ## Frames
 If you need something extra, you can make your own frame. It is simple <iframe> that integrates into main page. Look at predone to see how it works.
-### List of Standart Frames
- [DEV] Music
- [DEV] Charsheet
- [DEV] Chat
- [DEV] PDF-viewer
- [ ] Dices
- [ ] Map
- [ ] MapSelector
- [ ] Asset Manager
- [ ] Notes
- [ ] Token Maker
- [ ] Settings
+List of Standart Frames
+ - [DEV] Music
+ - [DEV] Charsheet
+ - [DEV] Chat
+ - [DEV] PDF-viewer
+ - [ ] Dices
+ - [ ] Map
+ - [ ] MapSelector
+ - [ ] Asset Manager
+ - [ ] Notes
+ - [ ] Token Maker
+ - [ ] Settings
 
 ## Roll20 Sheets
 ### -- IN DEVELOPMENT --
