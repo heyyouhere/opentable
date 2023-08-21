@@ -26,7 +26,7 @@ If you need something extra, you can make your own frame. It is simple <iframe> 
 
 ## Roll20 Sheets
 ### -- IN DEVELOPMENT --
-You can use Roll20 character sheets out of box. There are planty ready to play sheets at (Roll20 GitHub)[https://github.com/Roll20/roll20-character-sheets].
+You can use Roll20 character sheets out of box. There are planty ready to play sheets at [Roll20 GitHub](https://github.com/Roll20/roll20-character-sheets).
     
 ## TODO:
  - [DONE] Make a better UI layout. Single page application, served by server.
