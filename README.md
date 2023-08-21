@@ -1,24 +1,47 @@
 # Open source VTTRPG
+This is my attempt to make free as in freedom, self-hosted alternative VTTRPG.
 
-This is my attemd to make free for every one, self-hosted alternative for others VTTRPG.
-I'm trying to take as little dependences as possible and to take the simplest tools if nessesary.
-No huge frameworks, as much handwritten code, as possible.
+## Usage
+I'm planning to make a docker container, so you'll be able to setup Opentable with ease.
+Untill then, just build and run the thing.
+```console
+$ cargo run
+```
+Site is now available on http://localhost:1583 
 
-# TODO 
- - Make a better UI layout. Single page application, served by server.
- - Think of archetecture of Map object. 
+## Frames
+If you need something extra, you can make your own frame. It is simple <iframe> that integrates into main page. Look at predone to see how it works.
+### List of Standart Frames
+ - [DEV] Music
+ - [DEV] Charsheet
+ - [DEV] Chat
+ - [DEV] PDF-viewer
+ - [ ] Dices
+ - [ ] Map
+ - [ ] MapSelector
+ - [ ] Asset Manager
+ - [ ] Notes
+ - [ ] Token Maker
+ - [ ] Settings
+
+## Roll20 Sheets
+-- IN DEVELOPMENT --
+You can use Roll20 character sheets out of box. There are planty ready to play sheets at (Roll20 GitHub)[https://github.com/Roll20/roll20-character-sheets].
+    
+## TODO:
+ - [DONE] Make a better UI layout. Single page application, served by server.
  - Long Polling updates. Sync between multiple clients.
  - Example server that anyone can play around with.
- - Implementation of game mechanics. Maybe python3 modules that will handle game logic.
  - Imbeded token maker 
- - Imbeded PDF viewer.
+ - [DONE] Imbeded PDF viewer.
  - DM/Player separation.
  - Playable field.
- - Rolls library.
+ - [DEV] Rolls library.
  - Audio streaming.
 
 # Not in scope of project
-- Video and audio chat.
+ - Video and audio chat.
  - Asset store.
  - No high security measures - it's just games, after all.
+
 
