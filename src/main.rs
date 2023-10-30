@@ -127,7 +127,6 @@ fn handle_request(mut request: Request) -> Result<()>{
     }
 }
 
-mod rolls;
 
 fn main(){
     //  rolls::test();

@@ -49,12 +49,13 @@
 
          var myLayout,
              savedState = localStorage.getItem( 'savedState' );
-
-         if( savedState !== null ) {
-             myLayout = new GoldenLayout( JSON.parse( savedState ) );
-         } else {
              myLayout = new GoldenLayout( config );
-         }
+
+//         if( savedState !== null ) {
+//             myLayout = new GoldenLayout( JSON.parse( savedState ) );
+//         } else {
+//             myLayout = new GoldenLayout( config );
+//         }
          myLayout.registerComponent("CharSheet", function( container, componentState ){
              container.getElement().html(
                  '<div style="background-color: white; width:100%; height:100%">  <iframe width=100%" height="100%"" src="/frames/roll20-sheets/fate/fate_core_with_rolls-deutsch.html" title="fate"></iframe> </div>'
