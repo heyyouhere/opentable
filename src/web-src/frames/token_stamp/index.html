@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Token maker </title>
+        <meta charset="UTF-8">
+        <style>
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+            }
+            .container {
+                display: flex;
+                height: 100%;
+            }
+
+            .left-half, .right-half {
+                flex: 1;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            .content {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <button id='save'> Save image</button>
+        BORDER:
+        <input id='border_color_picker' type="color" name="favcolor" value="#ff0000">
+        BACKGROUND:
+        <input id='background_color_picker' type="color" name="favcolor" value="#ff0000">
+        <div class="container">
+            <div id="container" class="right-half"></div>
+            <div id="preview_container" class="left-half"></div>
+        </div>
+     </body>
+     <link rel="stylesheet" href="mystyle.css">
+     <script type='text/javascript' src="konva.js"></script>
+     <script type='text/javascript' src="script.js"></script>
+</html>
