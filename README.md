@@ -5,9 +5,9 @@ This is my attempt to make free as in freedom, self-hosted alternative VTTRPG.
 I'm planning to make a docker container, so you'll be able to setup Opentable with ease.
 Untill then, just build and run the thing.
 ```console
-$ cargo run
+$ go build  && ./opentable
 ```
-Site is now available on http://localhost:1583 
+Site is now available on http://localhost:1550 
 
 ## Frames
 If you need something extra, you can make your own frame. It is simple <iframe> that integrates into main page. Look at predone to see how it works.
