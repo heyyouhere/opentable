@@ -1,0 +1,137 @@
+{{ define "music"}}
+<div>
+    <audio id="map_audio" src="background.mp3"  loop></audio>
+    <input class="slider" type="range" id="music_volume" min="0" max="1" value = ".4" step = ".01"> 
+    <div>
+        <button class ="action_button" id="playbutton1"> Music #1 </button>
+    </div>
+    <div>
+        <button class="action_button" id="playbutton2"> Music #2 </button>
+    </div>
+    <div>
+        <button class="action_button"id="playbutton3"> Music #3 </button>
+    </div>
+    <div>
+        <button class="add_button"> + </button>
+    </div>
+</div>
+
+
+
+<script>
+    for (let e of document.querySelectorAll('input[type="range"].opentable')) {
+        e.style.setProperty('--value', e.value);
+        e.style.setProperty('--min', e.min == '' ? '0' : e.min);
+        e.style.setProperty('--max', e.max == '' ? '100' : e.max);
+        e.addEventListener('input', () => e.style.setProperty('--value', e.value));
+    }
+    let music_playing = true;
+    let audio_player = document.getElementById("map_audio");
+    let audio_pause_time;
+    let track1 = "background.mp3"
+    let track2 = "dota.mp3"
+    let track3 = "fnv.mp3"
+    audio_player.volume = 0.5;
+    document.getElementById("playbutton1").onclick = () =>{
+        if (audio_player.src != track1) {
+            audio_player.src = track1;
+            audio_player.play();
+        } else {
+            if (music_playing) {
+                audio_player.pause();
+                audio_pause_time = audio_player.currentTime
+                music_playing = !music_playing;
+            } else {
+                music_playing = !music_playing;
+                audio_player.play();
+                audio_player.currentTime = audio_pause_time
+            }
+        }
+    } 
+    document.getElementById("playbutton2").onclick = () =>{
+        if (audio_player.src != track2) {
+            audio_player.src = track2;
+            audio_player.play();
+        } else {
+            if (music_playing) {
+                audio_player.pause();
+                audio_pause_time = audio_player.currentTime
+                music_playing = !music_playing;
+            } else {
+                music_playing = !music_playing;
+                audio_player.play();
+                audio_player.currentTime = audio_pause_time
+            }
+        }
+    } 
+    document.getElementById("playbutton3").onclick = () =>{
+        if (audio_player.src != track3) {
+            audio_player.src = track3;
+            audio_player.play();
+        } else {
+            if (music_playing) {
+                audio_player.pause();
+                audio_pause_time = audio_player.currentTime
+                music_playing = !music_playing;
+            } else {
+                music_playing = !music_playing;
+                audio_player.play();
+                audio_player.currentTime = audio_pause_time
+            }
+        }
+    } 
+    let volume_range = document.getElementById("music_volume")
+    volume_range.onchange = () => {
+        audio_player.volume = volume_range.value;
+    }
+    
+</script> 
+
+
+<style> 
+    @import url("https://fonts.googleapis.com/css2?family=Saira");
+    body{
+        background-color: #171717;
+    }
+
+    div{
+        color: #FFF;
+        font-family: Saira;
+        font-size: 10px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: normal; 
+    }
+
+    button{
+        font-family: Saira;
+        font-size: 200%;
+        width: 90%;
+        margin-left: 5%;
+        border: none;
+        font-style: normal;
+    }
+    .slider{
+        width: 90%;
+        margin-left: 5%;
+        accent-color: #674D73;
+    }
+    .action_button{
+        background-color: #171717;
+        color: #FFF;
+        text-align: left;
+    }
+    .add_button{
+        color: #FFF;
+        text-align: center;
+        font-weight: 700;
+        border-radius: 20px;
+        background-color: #674D73;
+        line-height: normal;
+    }
+
+
+
+    </style>
+
+{{end}}

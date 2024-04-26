@@ -1,0 +1,59 @@
+.pdf-viewer {
+    width: 50%;
+    height: 100%;
+    float: right;
+}
+
+.PDFbutton {
+    background-color: palegreen;
+    width: 500px;
+    height: 250px;
+    font-size: 45;
+}
+
+.NewGameButton {
+    margin-top: 10px;
+}
+
+.Games {
+    width: 33%;
+    height: 100%;
+    font-size: 25px;
+    background-color: aquamarine;
+    float: left;
+}
+
+.MapsObjects {
+    width: 33%;
+    height: 100%;
+    font-size: 25px;
+    background-color: palegreen;
+    float: left;
+}
+
+.Maps {
+    height: 50%;
+}
+
+.Chat {
+    width: 33%;
+    height: 100%;
+    font-size: 25px;
+    background-color: palegoldenrod;
+    float: left;
+}
+
+.Game {
+    height: 10%;
+    font-size: 24px;
+    vertical-align: middle;
+    text-align: center;
+    background-color: palevioletred;
+    margin-top: 10px;
+}
+
+.controls {
+    width: 50%;
+    height: 100%;
+    float: left;
+}

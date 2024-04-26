@@ -1,0 +1,206 @@
+{{ define "playground" }}
+
+<!DOCTYPE html>
+<html>
+    <body style="background-color: white; overflow-y: hidden; overflow-x: hidden;">
+        <div> hello, playgroun </div>
+        <button id="save"> Save </button>
+        <div id="foo_canvas"></div>
+        
+    </body>
+<script src="konva.js"></script>
+<script>
+window.onload = () => {
+    const SQUARE_SIZE = 80;
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    function drawSquares(layer) {
+        let color = "black";
+        for (let i = 0; i < width; i+=SQUARE_SIZE){
+            let redLine = new Konva.Line({
+                points: [i, 0, i, height],
+                stroke: color,
+                strokeWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round',
+            });
+            layer.add(redLine);
+        }
+        for (let j = 0; j < height; j+=SQUARE_SIZE){
+            let redLine = new Konva.Line({
+                points: [0, j, width, j],
+                stroke: color,
+                strokeWidth: 1,
+                lineCap: 'round',
+                lineJoin: 'round',
+            });
+        layer.add(redLine);
+        } 
+    }
+
+    let isDragging = false;
+
+    let stage = new Konva.Stage({
+        container: 'foo_canvas',
+        width: width,
+        height: height,
+    });
+    
+    stage.on('mousedown touchstart', function(e) {
+        console.log("haha")
+        var pos = stage.getPointerPosition();
+        lastX = pos.x;
+        lastY = pos.y;
+        isDragging = true;
+    });
+    stage.on('mousemove touchmove', function(e) {
+        if (!isDragging) {
+            return;
+        }
+        var pos = stage.getPointerPosition();
+        var dx = pos.x - lastX;
+        var dy = pos.y - lastY;
+
+        stage.x(stage.x() + dx);
+        stage.y(stage.y() + dy);
+
+        lastX = pos.x;
+        lastY = pos.y;
+        layer.batchDraw();
+    });
+    stage.on('mouseup touchend', function() {
+        isDragging = false;
+    });
+
+    var scaleBy = 1.05; // Define the scale factor for zooming
+    var scale = 1;
+    stage.on('wheel', function(e) {
+    e.evt.preventDefault();
+
+    var oldScale = stage.scaleX();
+
+    var pointer = stage.getPointerPosition();
+
+    var mousePointTo = {
+        x: (pointer.x - stage.x()) / oldScale,
+        y: (pointer.y - stage.y()) / oldScale
+    };
+
+    var newScale = e.evt.deltaY > 0 ? oldScale * scaleBy : oldScale / scaleBy;
+
+    stage.scale({ x: newScale, y: newScale });
+
+    var newPos = {
+        x: pointer.x - mousePointTo.x * newScale,
+        y: pointer.y - mousePointTo.y * newScale
+    };
+
+    stage.position(newPos);
+    layer.batchDraw();
+});
+
+
+    let layer = new Konva.Layer();
+    let rectX = stage.width() / 2 - 50;
+    let rectY = stage.height() / 2 - 25;
+
+    drawSquares(layer);
+    var tr = new Konva.Transformer(
+ {keepRatio: false,}
+    );
+    layer.add(tr);
+
+    var imageObj = new Image();
+    imageObj.onload = function () {
+        let hero = new Konva.Image({
+                    x: SQUARE_SIZE,
+                    y: SQUARE_SIZE,
+                    image: imageObj,
+                    width: SQUARE_SIZE,
+                    height: SQUARE_SIZE,
+                    draggable: true,
+            });
+
+        tr.nodes([hero]);
+        layer.add(hero);
+        hero.on('mouseover', function () {
+            document.body.style.cursor = 'pointer';
+        });
+        hero.on('mouseout', function () {
+            document.body.style.cursor = 'default';
+        });
+        function snap_to_grid(element){
+            let x_div = Math.floor(element.x() / SQUARE_SIZE);
+            if (element.x() % SQUARE_SIZE > SQUARE_SIZE/2) {
+                element.x((x_div + 1) * SQUARE_SIZE);
+            } else {
+                element.x(x_div * SQUARE_SIZE);
+            } 
+
+            let y_div = Math.floor(element.y() / SQUARE_SIZE);
+            if (element.y() % SQUARE_SIZE > SQUARE_SIZE/2) {
+                element.y((y_div + 1) * SQUARE_SIZE);
+            } else {
+                element.y(y_div * SQUARE_SIZE);
+            } 
+            if (element.x() < 0) {
+                element.x(0)
+            }
+            if (element.y() < 0) {
+                element.y(0)
+            }
+            if (element.x() > width) {
+                element.x((Math.floor(width / SQUARE_SIZE) - 1) * SQUARE_SIZE)
+            }
+            if (element.y() > height) {
+                element.y((Math.floor(height / SQUARE_SIZE) - 1) * SQUARE_SIZE)
+            }
+
+
+            console.log(element.x(), element.y())
+        } 
+        hero.on('dragend', function (e) {
+            console.log(e);
+            snap_to_grid(hero);
+            layer.batchDraw();
+        });
+        
+        hero.on('transformend', function () {
+            console.log('transform end');
+            hero.scaleX(Math.round(hero.scaleX()))
+            hero.scaleY(Math.round(hero.scaleY()))
+            snap_to_grid(hero);
+            layer.batchDraw();
+        });
+
+        layer.add(hero);
+        stage.add(layer);
+      };
+    imageObj.src = 'test_token.png';
+
+  function saveJSON(obj) {
+        var jsonString = JSON.stringify(obj);
+        var blob = new Blob([jsonString], { type: "application/json" });
+        var url = URL.createObjectURL(blob);
+
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'data.json';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    save.onclick  = () => {
+        saveJSON(stage.toJSON())
+    }
+
+}
+
+
+
+</script>
+</html>
+
+{{end}}

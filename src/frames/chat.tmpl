@@ -1,0 +1,73 @@
+{{ define "chat" }} 
+    <div class="Chat">
+        <div style="text-align: center; font-size: 34;">
+            Chat
+        </div>
+        <div id="messages_container" style="overflow: scroll; height: 90%;">
+            <div id="message" class="Message">
+                <span class="Message_name"  id="message_name" > Author </span>
+                <div class="Message_text"> This is a long message, containing some important information </div>
+            </div>
+        </div>
+        <div class="Send_container">
+            <input id = "input" class="Send_input">
+            <button id = "send_button"  class="Send_button"> Send </button>
+        </div>
+    </div>
+
+<style>
+    .Chat{
+        height: 100%;
+        background-color : paleturquoise;
+    }
+    .Message{
+        margin-top: 10px;
+        width: 90%;
+        margin-left: 5%;
+        background-color: palevioletred;
+        border-style: solid;
+        border-width: 3px;
+        border-color: black;
+    }
+    .Message_text{
+        margin-left: 24px ;
+    }
+    .Send_container{
+        background-color: red;
+    }
+</style>
+
+
+
+<script>
+    const COUNT = 2;
+    let message = document.getElementById("message")
+    let parent = document.getElementById("messages_container")
+    for (let i = 0; i < COUNT; i++){
+        parent.appendChild(message.cloneNode(true));
+    }
+    function post_to_server(update){
+        console.log("update");
+    }
+
+    function send_message(){
+        if (send_input.value != ""){
+            let new_message = message.cloneNode(true);
+            new_message.childNodes[1].innerText = "heyyouhere";
+            new_message.childNodes[3].innerText = send_input.value;
+            send_input.value = "";
+            console.log(new_message.childNodes);
+
+            parent.appendChild(new_message);
+            parent.scrollIntoView();
+            send_input.focus();
+        }
+    }
+    parent.scrollIntoView();
+    let send_button = document.getElementById('send_button');
+    let send_input = document.getElementById('input');
+    send_button.onclick = send_message 
+</script>
+
+{{end}}
+

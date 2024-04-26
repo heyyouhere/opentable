@@ -1,0 +1,109 @@
+{{ define "index"}}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> HTML </title>
+        <meta charset="UTF-8">
+    </head>
+    <body>
+        <h1> Hello, opentable! </h1>
+        <div style="width:100%; height: 80%;" id="golden_layout_container"> </div>
+    </body>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-dark-theme.css" />
+    <script type="text/javascript" src="https://golden-layout.com/files/latest/js/goldenlayout.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="https://golden-layout.com/files/latest/css/goldenlayout-base.css" />
+
+    <script>
+        let config = {
+            content: [
+                {type: 'row',
+                    content:[{
+                        type: 'component',
+                        componentName: 'CharSheet',
+                        componentState: { label: 'A' }
+                    },
+                        {type: 'column',
+                            content:[{
+                                type: 'component',
+                                componentName: 'Chat',
+                                isClosable: false,
+                                componentState: { label: 'Hello, Anna!' }
+                            }]},
+                        {type: 'column',
+                            content:[{
+                                type: 'component',
+                                componentName: 'TokenStamper',
+                                isClosable: false,
+                                componentState: { label: 'Hello, Anna!' }
+                            }]},
+                        {type: 'row',
+                            content:[{
+                                type: 'component',
+                                componentName: 'Music',
+                                componentState: { label: 'Hello, Anna!' }
+                            }]},
+                        {type: 'column',
+                            content:[{
+                                type: 'component',
+                                componentName: 'PDF',
+                                componentState: { label: 'Hello, Anna!' }
+                            }]},
+                        {type: 'column',
+                            content:[{
+                                type: 'component',
+                                componentName: 'Playground',
+                                isClosable: false,
+                                componentState: { label: 'Hello, Anna!' }
+                            }]}
+                    ]
+                }]
+        };
+
+        let myLayout,
+            savedState = localStorage.getItem("savedLayout");
+        if( savedState !== null ) {
+            myLayout = new GoldenLayout( JSON.parse( savedState ) );
+        } else {
+            myLayout = new GoldenLayout( config );
+        }
+        myLayout.registerComponent("CharSheet", function( container, componentState ){
+            container.getElement().html(
+                '<div style="background-color: white; width:100%; height:100%">  <iframe width=100%" height="100%"" src="/frames/roll20-sheets/fate/fate_core_with_rolls-deutsch.html" title="fate"></iframe> </div>'
+            );
+        });
+        myLayout.registerComponent("Chat", function( container, componentState ){
+            container.getElement().html(
+                `{{ template "chat" }} `
+            );
+        });
+        myLayout.registerComponent("PDF", function( container, componentState ){
+            container.getElement().html(
+                ` {{template "pdf" }} `
+            );
+        });
+        myLayout.registerComponent("Music", function( container, componentState ){
+            container.getElement().html(
+                ` {{template "music" }} `
+            );
+        });
+        myLayout.registerComponent("TokenStamper", function( container, componentState ){
+            container.getElement().html(
+            ` {{template "token_stamper"}} `
+            );
+        });
+        myLayout.registerComponent("Playground", function( container, componentState ){
+            container.getElement().html(
+            ` {{template "playground"}} `
+            );
+        });
+        myLayout.init();
+        myLayout.on("stateChanged", function(){
+            var state = JSON.stringify( myLayout.toConfig() );
+            localStorage.setItem("savedState", state);
+        });
+    </script>
+
+</html>
+
+{{ end }} 
